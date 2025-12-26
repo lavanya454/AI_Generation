@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Loader, Card, FormField } from '../components';
 
 const RenderCards = ({ data, title }) => {
-  if (data?.length > 0) {
+  if (data.length > 0) {
     return data.map((post) => (
       <Card key={post._id} {...post} />
     ));
@@ -17,10 +17,11 @@ const RenderCards = ({ data, title }) => {
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
-  const [allPosts, setAllPosts] = useState([]); // ✅ FIX
+  const [allPosts, setAllPosts] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [searchedResults, setSearchedResults] = useState([]);
-  const [searchTimeout, setSearchTimeout] = useState(null);
+
+  const searchTimeoutRef = useRef(null); // ✅ FIX
 
   // ---------------- FETCH POSTS ----------------
   useEffect(() => {
@@ -38,7 +39,7 @@ const Home = () => {
         const result = await response.json();
         setAllPosts(result.data.reverse());
       } catch (error) {
-        alert(error.message);
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -52,19 +53,19 @@ const Home = () => {
     const value = e.target.value;
     setSearchText(value);
 
-    clearTimeout(searchTimeout);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
 
-    setSearchTimeout(
-      setTimeout(() => {
-        const searchResults = allPosts.filter(
-          (item) =>
-            item.name?.toLowerCase().includes(value.toLowerCase()) ||
-            item.prompt?.toLowerCase().includes(value.toLowerCase())
-        );
+    searchTimeoutRef.current = setTimeout(() => {
+      const searchResults = allPosts.filter(
+        (item) =>
+          item.name?.toLowerCase().includes(value.toLowerCase()) ||
+          item.prompt?.toLowerCase().includes(value.toLowerCase())
+      );
 
-        setSearchedResults(searchResults);
-      }, 500)
-    );
+      setSearchedResults(searchResults);
+    }, 500);
   };
 
   // ---------------- UI ----------------

@@ -29,7 +29,7 @@ const CreatePost = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('https://ai-generation-server.onrender.com/api/v1/post', {
+      const res = await fetch('http://localhost:8080/api/v1/post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -92,7 +92,7 @@ const CreatePost = () => {
       setQueuePos(null);
 
       // 1️⃣ Submit job to backend
-      const submitRes = await fetch('https://ai-generation-server.onrender.com/api/v1/dalle', {
+      const submitRes = await fetch('http://localhost:8080/api/v1/dalle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: form.prompt }),
